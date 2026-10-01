@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/brand/logo-horizontal.png" alt="Birinci Vites" width="640">
+</p>
+
 # Birinci Vites
 
 Türkiye'de B sınıfı sürücü belgesine hazırlanan adaylar için geliştirilmiş Expo ve React Native tabanlı mobil çalışma uygulaması.

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, AppState, BackHandler, Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import { Animated, AppState, BackHandler, Image, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
@@ -110,7 +110,7 @@ function Application() {
   const revealed = !!(session && current && session.revealed.includes(current.id));
   const canStart = loaded && !saving && !error && !saveError;
   return <SafeAreaView style={s.page}>{guideOpen && <GuideReader onClose={()=>setGuideOpen(false)} />}<StatusBar style="dark" /><ScrollView ref={scroll} scrollEventThrottle={16} onScroll={event => journeyScroll.setValue(Math.max(0, event.nativeEvent.contentOffset.y))} contentContainerStyle={[s.content, glass && !session && !result && { paddingBottom: 120 }]}>
-    <View style={s.row}><Text style={s.brand}>birinci <Text style={{ color: colors.green }}>vites.</Text></Text><Text style={s.badge}>B SINIFI</Text></View>
+    <View style={s.row}><Image source={require('./assets/brand/logo-horizontal.png')} resizeMode="contain" accessibilityLabel="Birinci Vites" style={s.brandLogo} /><Text style={s.badge}>B SINIFI</Text></View>
     {!!error && <Card><Text accessibilityRole="alert" style={s.notice}>{error}</Text><Button title="Tekrar dene" disabled={saving} onPress={() => { if (loadError) void load(); else void persist(history); }} /></Card>}
     {!loaded && !loadError && <Text style={s.body}>Çalışmaların yükleniyor…</Text>}
     {!!saveError && <Card><Text accessibilityRole="alert" style={s.notice}>{saveError}</Text><Button title="Kaydetmeyi tekrar dene" onPress={() => { void persist(history, session); }} disabled={saving} /></Card>}

@@ -28,7 +28,7 @@ export function Bar({ value }: { value: number }) { return <View style={s.track}
 export const s = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.bg }, content: { width: '100%', maxWidth: 700, alignSelf: 'center', padding: 22, gap: 20, paddingBottom: 36 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' },
-  brand: { fontSize: 23, fontWeight: '800', color: colors.ink, letterSpacing: -1 }, eyebrow: { color: colors.green, fontSize: 12, fontWeight: '700', letterSpacing: 1.8 },
+  brandLogo: { width: 190, height: 42 }, eyebrow: { color: colors.green, fontSize: 12, fontWeight: '700', letterSpacing: 1.8 },
   title: { color: colors.ink, fontSize: 34, fontWeight: '800', lineHeight: 41, letterSpacing: -1 }, h2: { color: colors.ink, fontSize: 21, fontWeight: '700', lineHeight: 29 },
   body: { color: colors.muted, fontSize: 15, lineHeight: 23 }, small: { color: colors.muted, fontSize: 12, lineHeight: 19 },
   card: { backgroundColor: colors.white, borderRadius: 22, padding: 22, gap: 15, borderWidth: 1, borderColor: colors.border },
