@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, AppState, BackHandler, Pressable, ScrollView, Text, View } from 'react-native';
+import { Animated, AppState, BackHandler, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
@@ -175,6 +175,7 @@ function Application() {
       <Card><Text style={s.h2}>MEB teorik e-Sınav çerçevesi</Text><Text style={s.body}>{examRules.questions} soru · {examRules.minutes} dakika · Başarı eşiği {examRules.passScore}/100</Text>{topics.map(topic => <View key={topic} style={s.row}><Text style={s.body}>{topic}</Text><Text style={s.letter}>{examRules.distribution[topic]} soru</Text></View>)}<Text style={s.small}>Yanlış cevaplar doğru cevapları azaltmaz. İşitme engelli adaylar için kılavuzda 15 dakika ek süre tanımlanır.</Text><Text style={s.small}>Kaynak kontrolü: 14 Eylül 2026</Text><Button title="MEB 2026 kılavuzunu aç" secondary onPress={() => setGuideOpen(true)} /></Card>
       <Card><Text style={s.h2}>Soru bankası hakkında</Text><Text style={s.body}>Havuzda {questions.length} soru var. Her denemede konu dağılımına uygun 50 soru seçilir; daha az karşılaştığın sorulara öncelik verilir. Bu içerik MEB onaylı değildir; güncel sınavda aynı soruların çıkacağı garanti edilmez.</Text></Card>
       <Card><Text style={s.h2}>Kayıtların cihazında</Text><Text style={s.body}>Hesap açman gerekmez. Çalışmaların ve verdiğin cevaplar bu cihazda saklanır; bulut yedeği yoktur. Ara vererek ana sayfaya dönebilir, kalan sürenle devam edebilirsin. Uygulama arka plana geçtiğinde de deneme duraklatılır. Uygulama verilerini silersen kayıtların silinir.</Text></Card>
+      <Card><Text style={s.h2}>Birinci Vites açık kaynak</Text><Text style={s.body}>Projeyi incelemek, gelişmeleri takip etmek veya katkıda bulunmak için GitHub deposunu açabilirsin.</Text><Button title="GitHub'da görüntüle →" secondary onPress={() => void Linking.openURL('https://github.com/berkantkull/birinci-vites')} /></Card>
     </>}
   </ScrollView>{(!session || session.pausedAt !== undefined) && !result && !entry && <NavigationBar>{(['home', 'progress', 'car', 'info'] as const).map((p, i) => <Pressable key={p} accessibilityRole="tab" accessibilityState={{ selected: p === page }} onPress={() => setPage(p)} style={[s.tab, glass && s.glassTab, glass && page === p && s.glassTabSelected]}><Icon name={(['book', 'chart', 'car', 'compass'] as const)[i]} size={22} color={page === p ? colors.green : colors.muted} /><Text style={{ fontSize: 12, color: page === p ? colors.green : colors.muted, fontWeight: page === p ? '800' : '500' }}>{['Çalış', 'Gelişim', 'Sürüş', 'Rehber'][i]}</Text></Pressable>)}</NavigationBar>}</SafeAreaView>;
 }
