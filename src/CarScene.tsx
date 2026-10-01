@@ -5,7 +5,15 @@ import { Button, Card, colors, s } from './ui';
 import { carSteps, carSections, drivingChecklist, failedCriteria, parseCarResults, type CarResult, type CarStep } from './carLesson';
 import { VehicleDiagram } from './VehicleDiagram';
 
-const KEY='ehliyet-yolu.car.v1';
+const KEY='birinci-vites.car.v1';
+const LEGACY_KEY='ehliyet-yolu.car.v1';
+async function readCarStore(){
+ const current=await AsyncStorage.getItem(KEY);
+ if(current!==null)return current;
+ const legacy=await AsyncStorage.getItem(LEGACY_KEY);
+ if(legacy!==null)await AsyncStorage.setItem(KEY,legacy);
+ return legacy;
+}
 export function CarScene({onBack,onScreenChange}:{onBack:()=>void;onScreenChange:()=>void}) {
  const [steps,setSteps]=useState<CarStep[]>([]);
  const [mode,setMode]=useState<'practice'|'exam'>('practice');
@@ -22,7 +30,7 @@ export function CarScene({onBack,onScreenChange}:{onBack:()=>void;onScreenChange
  const pending=useRef<CarResult|null>(null);
  const busy=useRef(false);
  async function load() {
-  try {setRecords(parseCarResults(await AsyncStorage.getItem(KEY)));setLoaded(true);setLoadError(false);setError('');}
+  try {setRecords(parseCarResults(await readCarStore()));setLoaded(true);setLoadError(false);setError('');}
   catch {setLoadError(true);setError('Araç tanıma kayıtları okunamadı. Tekrar deneyebilirsin.');}
  }
  useEffect(()=>{void load();},[]);

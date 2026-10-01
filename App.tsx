@@ -16,7 +16,15 @@ import { LiquidGlassProvider, useLiquidGlass } from './src/liquidGlass';
 import { Icon } from './src/icons';
 import { JourneyArt, Meta, ResultVisual, StudySnapshot, TopicIcon, TopicTile } from './src/visuals';
 
-const STORAGE_KEY = 'ehliyet-yolu.history.v1';
+const STORAGE_KEY = 'birinci-vites.history.v1';
+const LEGACY_STORAGE_KEY = 'ehliyet-yolu.history.v1';
+async function readHistoryStore() {
+  const current = await AsyncStorage.getItem(STORAGE_KEY);
+  if (current !== null) return current;
+  const legacy = await AsyncStorage.getItem(LEGACY_STORAGE_KEY);
+  if (legacy !== null) await AsyncStorage.setItem(STORAGE_KEY, legacy);
+  return legacy;
+}
 import { createExam, pauseSession, resumeSession, parseSession, remainingSeconds, type Session } from './src/examEngine';
 type Page = 'home' | 'progress' | 'info' | 'notebook' | 'car' | 'junction' | 'signs';
 export default function App() { return <SafeAreaProvider><LiquidGlassProvider><Application /></LiquidGlassProvider></SafeAreaProvider>; }
@@ -44,7 +52,7 @@ function Application() {
   const notebook = reviewEntries(history, questions);
   const daily = dailyReview(history, questions);
   async function load() {
-    try { const raw = await AsyncStorage.getItem(STORAGE_KEY); const previous = parseHistory(raw); const active = parseSession(raw ? JSON.parse(raw).session : null, questions); setHistory(previous); if (active && !previous.some(a => a.id === active.id)) { finished.current = false; setRemaining(remainingSeconds(active, Date.now())); setSession(active); } setLoaded(true); setLoadError(false); setError(''); }
+    try { const raw = await readHistoryStore(); const previous = parseHistory(raw); const active = parseSession(raw ? JSON.parse(raw).session : null, questions); setHistory(previous); if (active && !previous.some(a => a.id === active.id)) { finished.current = false; setRemaining(remainingSeconds(active, Date.now())); setSession(active); } setLoaded(true); setLoadError(false); setError(''); }
     catch { setLoadError(true); setError('Kayıtlar okunamadı. Mevcut verilerini korumak için yeni çalışma başlatılmadı.'); }
   }
   useEffect(() => { void load(); }, []);
@@ -102,7 +110,7 @@ function Application() {
   const revealed = !!(session && current && session.revealed.includes(current.id));
   const canStart = loaded && !saving && !error && !saveError;
   return <SafeAreaView style={s.page}>{guideOpen && <GuideReader onClose={()=>setGuideOpen(false)} />}<StatusBar style="dark" /><ScrollView ref={scroll} scrollEventThrottle={16} onScroll={event => journeyScroll.setValue(Math.max(0, event.nativeEvent.contentOffset.y))} contentContainerStyle={[s.content, glass && !session && !result && { paddingBottom: 120 }]}>
-    <View style={s.row}><Text style={s.brand}>ehliyet<Text style={{ color: colors.green }}>yolu.</Text></Text><Text style={s.badge}>B SINIFI</Text></View>
+    <View style={s.row}><Text style={s.brand}>birinci <Text style={{ color: colors.green }}>vites.</Text></Text><Text style={s.badge}>B SINIFI</Text></View>
     {!!error && <Card><Text accessibilityRole="alert" style={s.notice}>{error}</Text><Button title="Tekrar dene" disabled={saving} onPress={() => { if (loadError) void load(); else void persist(history); }} /></Card>}
     {!loaded && !loadError && <Text style={s.body}>Çalışmaların yükleniyor…</Text>}
     {!!saveError && <Card><Text accessibilityRole="alert" style={s.notice}>{saveError}</Text><Button title="Kaydetmeyi tekrar dene" onPress={() => { void persist(history, session); }} disabled={saving} /></Card>}

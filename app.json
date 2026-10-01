@@ -1,15 +1,17 @@
 {
   "expo": {
-    "name": "Ehliyet Yolu",
-    "slug": "ehliyet-yolu",
-    "version": "0.1.0",
+    "name": "Birinci Vites",
+    "slug": "birinci-vites",
+    "version": "0.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.berkantkull.birincivites"
     },
     "android": {
+      "package": "com.berkantkull.birincivites",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

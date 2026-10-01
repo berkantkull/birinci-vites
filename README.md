@@ -1,8 +1,8 @@
-# Ehliyet Yolu
+# Birinci Vites
 
 Türkiye'de B sınıfı sürücü belgesine hazırlanan adaylar için geliştirilmiş Expo ve React Native tabanlı mobil çalışma uygulaması.
 
-## v0.1.0 kapsamı
+## v0.1.1 kapsamı
 
 - 163 soruluk havuzdan MEB konu dağılımına göre hazırlanan 50 soruluk sınav provası
 - 45 dakikalık sayaç, ara verme ve kaldığın yerden devam etme
@@ -54,7 +54,7 @@ Ana ekran akışı [App.tsx](App.tsx), sınav motoru [src/examEngine.ts](src/exa
 
 ## Kapsam ve sorumluluk
 
-Ehliyet Yolu, Millî Eğitim Bakanlığına bağlı veya MEB tarafından onaylanmış bir uygulama değildir. İçerikler eğitim ve prova amacı taşır; güncel sınavda aynı soruların çıkacağını veya sınav başarısını garanti etmez. Mevzuat ve sınav uygulamaları değişebileceği için resmî kaynaklar ayrıca kontrol edilmelidir.
+Birinci Vites, Millî Eğitim Bakanlığına bağlı veya MEB tarafından onaylanmış bir uygulama değildir. İçerikler eğitim ve prova amacı taşır; güncel sınavda aynı soruların çıkacağını veya sınav başarısını garanti etmez. Mevzuat ve sınav uygulamaları değişebileceği için resmî kaynaklar ayrıca kontrol edilmelidir.
 
 Çalışma geçmişi cihazda saklanır. Hesap ve bulut yedeği henüz bulunmaz; uygulama verileri silinirse kayıtlar da silinir.
 
