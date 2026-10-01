@@ -43,6 +43,19 @@ carSteps.push(
 );
 export const carSections: CarSection[] = ['Kaput altı','Bagaj','Kokpit','Göstergeler','Pedallar','Lastikler'];
 export function failedCriteria(steps: CarStep[],answers: string[]) { return [...new Set(answers.flatMap((a,i)=>steps[i]?.criterion && a!==steps[i].target ? [steps[i].criterion!] : []))]; }
+export function createCommissionRound(count = 10, random = Math.random) {
+ const groups = new Map<number, CarStep[]>();
+ for (const step of carSteps) {
+  if (step.criterion === undefined) continue;
+  groups.set(step.criterion, [...(groups.get(step.criterion) ?? []), step]);
+ }
+ const selected = [...groups.values()].map(group => group[Math.floor(random() * group.length)]);
+ for (let index = selected.length - 1; index > 0; index -= 1) {
+  const swap = Math.floor(random() * (index + 1));
+  [selected[index], selected[swap]] = [selected[swap], selected[index]];
+ }
+ return selected.slice(0, Math.max(1, Math.min(count, selected.length)));
+}
 export const drivingChecklist = [
  ['Hazırlık','Koltuk ve aynaları ayarla; emniyet kemerini tak. Kemer takmamak kırmızı, koltuk/ayna ayarını kontrol etmemek sarı maddelerdendir.'],
  ['Kalkış','Aynalarla trafiği ve omuz üstü bakışla kör noktayı kontrol et, doğru sinyali ver.'],

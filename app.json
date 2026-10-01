@@ -2,7 +2,7 @@
   "expo": {
     "name": "Birinci Vites",
     "slug": "birinci-vites",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -40,6 +40,14 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Birinci Vites, kurs aracının fotoğraflarını yalnızca cihazında hazırladığın araç profiline eklemek için kullanır.",
+          "cameraPermission": "Birinci Vites, kurs aracının kaput, bagaj ve kokpit fotoğraflarını çekebilmen için kamerayı kullanır.",
+          "microphonePermission": false
         }
       ]
     ]

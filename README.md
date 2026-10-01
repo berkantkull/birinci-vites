@@ -10,7 +10,7 @@ Türkiye'de B sınıfı sürücü belgesine hazırlanan adaylar için geliştiri
 
 **PWA:** [berkantkull.github.io/birinci-vites](https://berkantkull.github.io/birinci-vites/)
 
-## v0.1.1 kapsamı
+## v0.2.0 kapsamı
 
 - 163 soruluk havuzdan MEB konu dağılımına göre hazırlanan 50 soruluk sınav provası
 - 45 dakikalık sayaç, ara verme ve kaldığın yerden devam etme
@@ -20,6 +20,8 @@ Türkiye'de B sınıfı sürücü belgesine hazırlanan adaylar için geliştiri
 - 26 levhalık Trafik İşaretleri keşif alanı ve hızlı test
 - Kaput altı, bagaj, kokpit, göstergeler, pedallar ve lastikler için araç tanıma çalışması
 - Direksiyon sınavı öncesi araç bilgisi provası ve sürüş hazırlık listesi
+- Türkçe sesli sorular, rastgele tur, öğretici/gerçek/stres seçenekleri ve mavi hata takibiyle Komisyon Provası
+- Kurs aracının fotoğraflarında gerçek parça konumlarını işaretleyip kişisel tur oluşturan Kurs Arabam
 - Uygulama içinden okunabilen 2026 MEB e-Sınav kılavuzu
 - iOS 26 ve üzerindeki desteklenen cihazlarda Liquid Glass görünümü
 
@@ -67,6 +69,8 @@ npx expo export --platform web
 - AsyncStorage ile cihaz içi kayıt
 - React Native SVG ile uygulama içi çizimler
 - `expo-glass-effect` ile desteklenen iOS cihazlarında Liquid Glass
+- `expo-speech` ile Türkçe komisyon seslendirmesi
+- `expo-image-picker` ile kamera ve galeriden cihaz içi Kurs Arabam profili
 
 Ana ekran akışı [App.tsx](App.tsx), sınav motoru [src/examEngine.ts](src/examEngine.ts), soru modeli [src/domain.ts](src/domain.ts) ve araç tanıma içeriği [src/carLesson.ts](src/carLesson.ts) dosyalarındadır. Ayrıntılı karar ve kaynak notları [docs](docs) klasöründe bulunur.
 
