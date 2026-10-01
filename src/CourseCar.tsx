@@ -121,7 +121,7 @@ export function CourseCar({ onBack, onScreenChange }: { onBack: () => void; onSc
   if (!loaded) return <><Button title="← Sürüş alanı" secondary onPress={onBack}/><Text style={s.body}>Kurs aracın yükleniyor…</Text></>;
   if (mode === 'home') return <>
     <Button title="← Sürüş alanı" secondary onPress={onBack}/>
-    <Text style={s.eyebrow}>KURS ARABAM</Text><Text style={s.title}>Sınava gireceğin araçla çalış.</Text>
+    <Text style={s.eyebrow}>KURS ARABAM</Text><Text style={s.title}>Kendi kurs aracınla çalış.</Text>
     {!!error && <Text accessibilityRole="alert" style={s.notice}>{error}</Text>}
     {!profile ? <Card><Text style={s.h2}>Aracını bir kez tanıt.</Text><Text style={s.body}>Kaput, bagaj ve kokpit fotoğraflarını ekle. Parçaların gerçek yerlerini işaretle; Birinci Vites bu fotoğraflardan sana özel çalışma hazırlasın.</Text><Button title="Kurs aracımı oluştur" onPress={openEditor}/></Card> : <>
       <Card><Text style={s.eyebrow}>KAYITLI ARAÇ</Text><Text style={s.h2}>{profile.name}</Text><Text style={s.body}>{profile.photos.length}/3 bölüm fotoğrafı · {readyQuestions.length} işaretli parça</Text><Text style={s.small}>Son düzenleme: {new Date(profile.updatedAt).toLocaleString('tr-TR')}</Text><Button title="Kendi aracımla çalış" disabled={!readyQuestions.length} onPress={beginStudy}/><Button title="Fotoğrafları ve parçaları düzenle" secondary onPress={openEditor}/></Card>
@@ -132,7 +132,7 @@ export function CourseCar({ onBack, onScreenChange }: { onBack: () => void; onSc
 
   if (mode === 'edit') return <>
     <Button title="← Kurs Arabam" secondary disabled={saving} onPress={() => setMode('home')}/>
-    <Text style={s.eyebrow}>ARACINI TANIT</Text><Text style={s.title}>Üç fotoğraf. Gerçek bir prova.</Text>
+    <Text style={s.eyebrow}>ARACINI TANIT</Text><Text style={s.title}>Aracını üç fotoğrafla tanıt.</Text>
     {!!error && <Text accessibilityRole="alert" style={s.notice}>{error}</Text>}
     <Card><Text style={s.h2}>Aracın adı</Text><TextInput accessibilityLabel="Kurs aracının adı" value={draft.name} onChangeText={name => { setDraft(current => ({ ...current, name })); setDirty(true); }} placeholder="Örn. Beyaz Clio" placeholderTextColor={colors.muted} style={[s.option, { color: colors.ink, fontSize: 16 }]} /></Card>
     {courseCarAreas.map(({ area, description, labels }) => {

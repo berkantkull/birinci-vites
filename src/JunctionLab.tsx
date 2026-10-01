@@ -60,7 +60,7 @@ export function JunctionLab({onBack}:{onBack:()=>void}) {
  function restart(){setTour(createJunctionTour());setIndex(0);setSelected(null);setScore(0);setDone(false);}
  return <>
   <Button title="← Çalışma alanına dön" secondary onPress={onBack}/>
-  <Text style={s.eyebrow}>KAVŞAK LABORATUVARI</Text><Text style={s.title}>Bak. Karar ver.{'\n'}Yolu paylaş.</Text>
+  <Text style={s.eyebrow}>KAVŞAK LABORATUVARI</Text><Text style={s.title}>Kavşakta önce kim geçer?</Text>
   {done ? <Card><Text style={s.eyebrow}>TUR TAMAMLANDI</Text><Text style={s.big}>{score}/{tour.length}</Text><Text style={s.h2}>{score===tour.length?'Kavşaklar sende net.':score>=3?'İyi gidiyorsun.':'Bir tur daha çok iyi gelir.'}</Text><Text style={s.body}>Yeni turda 15 durumluk havuzdan farklı bir karışım gelir.</Text><Button title="Yeni 5 durum getir" onPress={restart}/><Button title="Ana sayfaya dön" secondary onPress={onBack}/></Card> : <>
    <View style={s.row}><Text style={s.badge}>{index+1}/{tour.length}</Text><Text style={s.small}>15 senaryodan seçildi · yaklaşık 2 dakika</Text></View><Bar value={(index+1)/tour.length*100}/>
    <JunctionArt scene={item.scene}/><Text style={s.h2}>{item.question}</Text>

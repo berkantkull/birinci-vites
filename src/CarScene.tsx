@@ -77,7 +77,7 @@ export function CarScene({onBack,onScreenChange}:{onBack:()=>void;onScreenChange
  return <>
   <Button title="← Ana sayfa" secondary disabled={saving} onPress={onBack}/>
   <Text style={s.eyebrow}>DİREKSİYON SINAVINA HAZIRLIK</Text>
-  <Text style={s.title}>Komisyon gelmeden{'\n'}sen hazır ol.</Text>
+  <Text style={s.title}>Komisyon sorularını önceden çalış.</Text>
   {!steps.length && <Text style={s.body}>Sesli komisyon provasıyla sınav anını çalış veya Kurs Arabam'a gerçek eğitim aracını tanıt.</Text>}
   {!!error && <Card><Text accessibilityRole="alert" style={s.notice}>{error}</Text><Button title="Tekrar dene" disabled={saving} onPress={()=>{void(loadError?load():complete());}}/></Card>}
   {!loaded ? <Text style={s.body}>Kayıtların yükleniyor…</Text> : !steps.length ? <>

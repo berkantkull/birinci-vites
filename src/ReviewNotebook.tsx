@@ -10,7 +10,7 @@ export function ReviewNotebook({ entries, disabled, onStudy, onBack }: { entries
   return <>
     <Button title="← Ana sayfa" secondary onPress={onBack} />
     <Text style={s.eyebrow}>HER HATA BİR İPUCU</Text>
-    <Text style={s.title}>Hatalarım defteri.</Text>
+    <Text style={s.title}>Yanlış cevapların</Text>
     <Text style={s.body}>Yanlış yaptığın sorular burada kalır. Sonraki çalışmalarda bir doğruyla pekiştirmeye, üst üste iki doğruyla öğrendiklerine geçer. Yeniden yanlış yaparsan tekrar listesine döner.</Text>
     <View style={[s.row, { justifyContent: 'flex-start' }]}>{['Tekrar bak','Pekiştir','Öğrendim'].map(label => <Pressable key={label} accessibilityRole="tab" accessibilityState={{ selected: filter===label }} onPress={() => { setFilter(label); setOpened(null); }} style={{ backgroundColor: filter===label ? colors.ink : '#E5EBDC', borderRadius: 20, padding: 13, minHeight: 48 }}><Text style={{ color: filter===label ? 'white' : colors.ink, fontWeight: '700' }}>{label} · {entries.filter(e=>e.status===label).length}</Text></Pressable>)}</View>
     {disabled && <Text style={s.small}>Yeni tekrar için açık çalışmanı tamamla. Defterini şimdi inceleyebilirsin.</Text>}
