@@ -6,7 +6,7 @@
 
 Türkiye'de B sınıfı sürücü belgesine hazırlanan adaylar için geliştirilmiş Expo ve React Native tabanlı mobil çalışma uygulaması.
 
-**GitHub:** [github.com/berkantkull/birinci-vites](https://github.com/berkantkull/birinci-vites)
+
 
 ## v0.1.1 kapsamı
 
