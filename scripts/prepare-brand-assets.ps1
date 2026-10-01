@@ -3,7 +3,9 @@ Add-Type -AssemblyName System.Drawing
 $sourceRoot = 'C:\Users\Berkant\OneDrive\Belgeler\birincivites'
 $assetRoot = 'C:\Users\Berkant\OneDrive\Belgeler\helloworld\assets'
 $brandRoot = Join-Path $assetRoot 'brand'
+$publicRoot = 'C:\Users\Berkant\OneDrive\Belgeler\helloworld\public'
 New-Item -ItemType Directory -Force -Path $brandRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $publicRoot | Out-Null
 
 $sources = @{
   LogoGradient = Join-Path $sourceRoot 'ChatGPT Görseli 1 Eki 2026 15_30_51-1.png'
@@ -87,3 +89,9 @@ $background.Save((Join-Path $assetRoot 'android-icon-background.png'), [System.D
 $background.Dispose()
 Save-Image $sources.Mark (Join-Path $assetRoot 'favicon.png') 64 64 3 10 58 44 $markCrop[0] $markCrop[1] $markCrop[2] $markCrop[3]
 Save-Image $sources.Mark (Join-Path $assetRoot 'splash-icon.png') 1024 1024 202 274 620 475 $markCrop[0] $markCrop[1] $markCrop[2] $markCrop[3]
+
+# Installable web app icons.
+Save-Image $sources.AppIcon (Join-Path $publicRoot 'pwa-icon-192.png') 192 192 0 0 192 192 0 0 1254 1254
+Save-Image $sources.AppIcon (Join-Path $publicRoot 'pwa-icon-512.png') 512 512 0 0 512 512 0 0 1254 1254
+Save-Image $sources.AppIcon (Join-Path $publicRoot 'pwa-maskable-512.png') 512 512 0 0 512 512 0 0 1254 1254
+Save-Image $sources.AppIcon (Join-Path $publicRoot 'apple-touch-icon.png') 180 180 0 0 180 180 0 0 1254 1254

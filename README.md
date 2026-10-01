@@ -8,6 +8,8 @@ Türkiye'de B sınıfı sürücü belgesine hazırlanan adaylar için geliştiri
 
 
 
+**PWA:** [berkantkull.github.io/birinci-vites](https://berkantkull.github.io/birinci-vites/)
+
 ## v0.1.1 kapsamı
 
 - 163 soruluk havuzdan MEB konu dağılımına göre hazırlanan 50 soruluk sınav provası
@@ -39,6 +41,16 @@ npm run ios
 ```
 
 Windows üzerinde yerel iOS derlemesi yapılamaz. iOS için Expo Go, development build veya EAS Build kullanılabilir.
+
+## PWA kurulumu
+
+Bağlantıyı telefonda açtıktan sonra Android/Chrome'da **Uygulamayı yükle** veya **Ana ekrana ekle** seçilir. iPhone/Safari'de **Paylaş → Ana Ekrana Ekle** kullanılır. İlk açılıştan sonra temel uygulama dosyaları çevrimdışı kullanım için cihazda saklanır.
+
+Yeni bir web sürümü yayımlamak için:
+
+```sh
+npm run deploy
+```
 
 ## Doğrulama
 
