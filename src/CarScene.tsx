@@ -6,6 +6,7 @@ import { Button, Card, colors, s } from './ui';
 import { carSteps, carSections, createCommissionRound, drivingChecklist, failedCriteria, parseCarResults, type CarResult, type CarStep } from './carLesson';
 import { VehicleDiagram } from './VehicleDiagram';
 import { CourseCar } from './CourseCar';
+import { LessonLog } from './LessonLog';
 
 const KEY='birinci-vites.car.v1';
 const LEGACY_KEY='ehliyet-yolu.car.v1';
@@ -16,8 +17,9 @@ async function readCarStore(){
  if(legacy!==null)await AsyncStorage.setItem(KEY,legacy);
  return legacy;
 }
-export function CarScene({onBack,onScreenChange}:{onBack:()=>void;onScreenChange:()=>void}) {
- const [scene,setScene]=useState<'menu'|'course-car'>('menu');
+export function CarScene({onBack,onScreenChange,initialScene='menu'}:{onBack:()=>void;onScreenChange:()=>void;initialScene?:'menu'|'course-car'|'lesson-log'}) {
+ const [scene,setScene]=useState<'menu'|'course-car'|'lesson-log'>(initialScene);
+ const [lessonStart,setLessonStart]=useState(false);
  const [steps,setSteps]=useState<CarStep[]>([]);
  const [mode,setMode]=useState<'practice'|'exam'>('practice');
  const [commissionStyle,setCommissionStyle]=useState<'coach'|'real'|'stress'>('real');
@@ -74,6 +76,7 @@ export function CarScene({onBack,onScreenChange}:{onBack:()=>void;onScreenChange
   finally {busy.current=false;setSaving(false);}
  }
  if(scene==='course-car')return <CourseCar onBack={()=>setScene('menu')} onScreenChange={onScreenChange}/>;
+ if(scene==='lesson-log')return <LessonLog startNew={lessonStart} onBack={()=>{setLessonStart(false);setScene('menu');}} onScreenChange={onScreenChange}/>;
  return <>
   <Button title="← Ana sayfa" secondary disabled={saving} onPress={onBack}/>
   <Text style={s.eyebrow}>DİREKSİYON SINAVINA HAZIRLIK</Text>
@@ -86,6 +89,7 @@ export function CarScene({onBack,onScreenChange}:{onBack:()=>void;onScreenChange
    <Button title={showRules?'Değerlendirme notunu gizle':'MEB değerlendirme notu'} secondary onPress={()=>setShowRules(!showRules)}/>
    {showRules && <Text style={s.small}>Kaynak: 9 Ocak 2025’ten itibaren kullanılan MEB EK-4 formu, I. bölüm ve son sayfa notları. Formda 20 araç bilgisi maddesi vardır; otomatik ve elektrikli araca özgü maddeler bu manuel örneğe dahil değildir. Beş mavi madde, iki sarı ihlal veya tek kırmızı ihlal gerçek sınavın sonlandırılmasına neden olur. Buradaki prova yalnız araç bilgisi bölümünü modeller; sürüş yeterliliği sonucu vermez.</Text>}</Card>
    <Card><Text style={s.eyebrow}>SENİN GERÇEK ARACIN</Text><Text style={s.h2}>Kurs Arabam</Text><Text style={s.body}>Kurs aracının kaput, bagaj ve kokpit fotoğraflarını ekle. Parçaları gerçek yerlerinde işaretle ve kendi aracına özel prova çöz.</Text><Button title="Kurs Arabam'ı aç →" onPress={()=>setScene('course-car')}/></Card>
+   <Card><Text style={s.eyebrow}>30 SANİYELİK DERS NOTU</Text><Text style={s.h2}>Ders Bitti</Text><Text style={s.body}>Bugün ne çalıştığını ve hocanın neyi tekrar etmeni söylediğini kaydet. Sonraki dersten önce kısa hatırlatmanı gör.</Text><Button title="Bugünkü dersi kaydet →" onPress={()=>{setLessonStart(true);setScene('lesson-log');}}/><Button title="Ders notlarını gör" secondary onPress={()=>{setLessonStart(false);setScene('lesson-log');}}/></Card>
    <Card><Text style={s.eyebrow}>TEMEL ARAÇ EĞİTİMİ</Text><Text style={s.h2}>Örnek araç üzerinde keşfet</Text><Text style={s.body}>Kurs aracını henüz eklemediysen parçaları çizim üzerinde öğrenebilirsin.</Text>
    {carSections.map(section=><Button key={section} title={`${section} · ${carSteps.filter(q=>q.section===section).length} adım`} secondary onPress={()=>begin(carSteps.filter(q=>q.section===section),'practice')}/>)}</Card>
    <Card><Text style={s.eyebrow}>SÜRÜŞE GEÇMEDEN</Text><Text style={s.h2}>Yola hazırlık listem</Text><Text style={s.small}>Kendin için işaretle. Bu liste uygulamalı sürüş sınavı veya geçme puanı değildir; işaretler bu ekranda kaldığın sürece tutulur.</Text>{drivingChecklist.map(([title,body],i)=><Pressable key={title} accessibilityRole="checkbox" accessibilityState={{checked:checks.includes(i)}} onPress={()=>setChecks(checks.includes(i)?checks.filter(n=>n!==i):[...checks,i])} style={[s.option,{alignItems:'flex-start'}]}><Text style={s.letter}>{checks.includes(i)?'✓':'○'}</Text><View style={{flex:1,gap:5}}><Text style={[s.h2,{fontSize:17}]}>{title}</Text><Text style={s.small}>{body}</Text></View></Pressable>)}</Card>

@@ -2,14 +2,9 @@
   "expo": {
     "name": "Birinci Vites",
     "slug": "birinci-vites",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#F3F5F0"
-    },
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
@@ -48,6 +43,14 @@
           "photosPermission": "Birinci Vites, kurs aracının fotoğraflarını yalnızca cihazında hazırladığın araç profiline eklemek için kullanır.",
           "cameraPermission": "Birinci Vites, kurs aracının kaput, bagaj ve kokpit fotoğraflarını çekebilmen için kamerayı kullanır.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Birinci Vites, kurs aracının paylaşım QR kodunu okuyabilmen için kamerayı kullanır.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
         }
       ]
     ]

@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Image, Pressable, Text, TextInput, View, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import * as Clipboard from 'expo-clipboard';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import QRCode from 'react-native-qrcode-svg';
 import { Button, Card, colors, s } from './ui';
-import { courseCarAreas, courseCarQuestions, emptyCourseCar, isHotspotCorrect, parseCourseCar, setCourseCarHotspot, shuffleCourseCarQuestions, upsertCourseCarPhoto, type CourseCarArea, type CourseCarProfile } from './courseCarModel';
+import { courseCarAreas, courseCarFromShare, courseCarQuestions, emptyCourseCar, encodeCourseCarShare, isHotspotCorrect, parseCourseCar, parseCourseCarShare, setCourseCarHotspot, shuffleCourseCarQuestions, upsertCourseCarPhoto, type CourseCarArea, type CourseCarProfile, type CourseCarShare } from './courseCarModel';
 
 const COURSE_CAR_KEY = 'birinci-vites.course-car.v1';
-type Mode = 'home' | 'edit' | 'study' | 'result';
+type Mode = 'home' | 'edit' | 'study' | 'result' | 'share' | 'scan';
 type Point = { x: number; y: number; correct: boolean };
 
 export function CourseCar({ onBack, onScreenChange }: { onBack: () => void; onScreenChange: () => void }) {
@@ -23,6 +26,11 @@ export function CourseCar({ onBack, onScreenChange }: { onBack: () => void; onSc
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState('');
+  const [shareCode, setShareCode] = useState('');
+  const [importText, setImportText] = useState('');
+  const [importCandidate, setImportCandidate] = useState<CourseCarShare | null>(null);
+  const [scanned, setScanned] = useState(false);
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
   useEffect(() => {
     AsyncStorage.getItem(COURSE_CAR_KEY)
@@ -100,6 +108,38 @@ export function CourseCar({ onBack, onScreenChange }: { onBack: () => void; onSc
     setMode('study');
   }
 
+  function openShare() {
+    if (!profile) return;
+    try { setShareCode(encodeCourseCarShare(profile)); setError(''); setMode('share'); }
+    catch (reason) { setError(reason instanceof Error ? reason.message : 'Paylaşım kodu hazırlanamadı.'); }
+  }
+
+  function readShare(value: string) {
+    try {
+      const parsed = parseCourseCarShare(value.trim());
+      setImportCandidate(parsed); setImportText(value.trim()); setScanned(true); setError('');
+    } catch (reason) {
+      setImportCandidate(null); setScanned(false);
+      setError(reason instanceof Error ? reason.message : 'Paylaşım kodu okunamadı.');
+    }
+  }
+
+  async function pasteShare() {
+    try { const value = await Clipboard.getStringAsync(); setImportText(value); readShare(value); }
+    catch { setError('Pano okunamadı. Kodu aşağıdaki alana yapıştırabilirsin.'); }
+  }
+
+  async function importShare() {
+    if (!importCandidate) return;
+    const next = courseCarFromShare(importCandidate);
+    setSaving(true);
+    try {
+      await AsyncStorage.setItem(COURSE_CAR_KEY, JSON.stringify(next));
+      setProfile(next); setDraft(next); setImportCandidate(null); setImportText(''); setError(''); setMode('home');
+    } catch { setError('Araç kodu kaydedilemedi. Tekrar deneyebilirsin.'); }
+    finally { setSaving(false); }
+  }
+
   function answerPhoto(event: GestureResponderEvent) {
     if (answer) return;
     const question = questions[questionIndex];
@@ -124,10 +164,30 @@ export function CourseCar({ onBack, onScreenChange }: { onBack: () => void; onSc
     <Text style={s.eyebrow}>KURS ARABAM</Text><Text style={s.title}>Kendi kurs aracınla çalış.</Text>
     {!!error && <Text accessibilityRole="alert" style={s.notice}>{error}</Text>}
     {!profile ? <Card><Text style={s.h2}>Aracını bir kez tanıt.</Text><Text style={s.body}>Kaput, bagaj ve kokpit fotoğraflarını ekle. Parçaların gerçek yerlerini işaretle; Birinci Vites bu fotoğraflardan sana özel çalışma hazırlasın.</Text><Button title="Kurs aracımı oluştur" onPress={openEditor}/></Card> : <>
-      <Card><Text style={s.eyebrow}>KAYITLI ARAÇ</Text><Text style={s.h2}>{profile.name}</Text><Text style={s.body}>{profile.photos.length}/3 bölüm fotoğrafı · {readyQuestions.length} işaretli parça</Text><Text style={s.small}>Son düzenleme: {new Date(profile.updatedAt).toLocaleString('tr-TR')}</Text><Button title="Kendi aracımla çalış" disabled={!readyQuestions.length} onPress={beginStudy}/><Button title="Fotoğrafları ve parçaları düzenle" secondary onPress={openEditor}/></Card>
+      <Card><Text style={s.eyebrow}>KAYITLI ARAÇ</Text><Text style={s.h2}>{profile.name}</Text><Text style={s.body}>{profile.photos.length}/3 bölüm fotoğrafı · {readyQuestions.length} işaretli parça</Text><Text style={s.small}>Son düzenleme: {new Date(profile.updatedAt).toLocaleString('tr-TR')}</Text><Button title="Kendi aracımla çalış" disabled={!readyQuestions.length} onPress={beginStudy}/><Button title="Fotoğrafları ve parçaları düzenle" secondary onPress={openEditor}/><Button title="Araç paylaşım kodu" secondary disabled={!readyQuestions.length && !profile.sharedHotspots?.length} onPress={openShare}/></Card>
       {!readyQuestions.length && <Text style={s.notice}>Çalışma başlatmak için en az bir fotoğrafta bir parçanın yerini işaretle.</Text>}
     </>}
+    <Card><Text style={s.eyebrow}>KURSUNDAN AL</Text><Text style={s.h2}>Araç kodunu okut</Text><Text style={s.body}>Kursun Birinci Vites araç kodu verdiyse işaretli parçaları tek seferde içe aktar.</Text><Button title="QR veya kodla içe aktar →" secondary onPress={() => {setMode('scan');setScanned(false);setImportCandidate(null);setError('');}}/></Card>
     <Card><Text style={s.h2}>Fotoğraflar yalnız bu cihazda</Text><Text style={s.small}>Araç fotoğrafları hesabımıza veya bir sunucuya gönderilmez. Uygulama verilerini silersen araç profilin de silinir. Plaka ve kişisel belge görünmeyecek şekilde fotoğraf çek.</Text></Card>
+  </>;
+
+  if (mode === 'share') return <>
+    <Button title="← Kurs Arabam" secondary onPress={() => setMode('home')}/>
+    <Text style={s.eyebrow}>ARAÇ PAYLAŞIM KODU</Text><Text style={s.title}>{profile?.name}</Text>
+    <Card><View style={{alignItems:'center',paddingVertical:10}}><QRCode value={shareCode} size={230} color={colors.ink} backgroundColor={colors.white}/></View><Text style={s.body}>Öğrenci Birinci Vites’te Kurs Arabam → QR veya kodla içe aktar bölümünü açıp bu kodu okutur.</Text><Button title="Kodu kopyala" onPress={() => void Clipboard.setStringAsync(shareCode)}/></Card>
+    <Card><Text style={s.h2}>Fotoğraflar paylaşılmaz</Text><Text style={s.small}>Kod yalnız araç adını ve işaret noktalarını taşır. Öğrenci kaput, bagaj ve kokpit fotoğraflarını aynı açıya yakın biçimde kendi cihazında çeker; aktarılan işaretler fotoğraflara otomatik yerleşir.</Text></Card>
+  </>;
+
+  if (mode === 'scan') return <>
+    <Button title="← Kurs Arabam" secondary disabled={saving} onPress={() => setMode('home')}/>
+    <Text style={s.eyebrow}>ARAÇ KODUNU AL</Text><Text style={s.title}>QR kodu kameraya göster.</Text>
+    {!!error && <Text accessibilityRole="alert" style={s.notice}>{error}</Text>}
+    {!importCandidate && <>
+      {!cameraPermission ? <Text style={s.body}>Kamera izni kontrol ediliyor…</Text> : !cameraPermission.granted ? <Card><Text style={s.h2}>QR için kamera izni</Text><Text style={s.body}>Kamera yalnız ekrandaki araç QR kodunu okumak için kullanılır.</Text><Button title="Kameraya izin ver" onPress={() => void requestCameraPermission()}/></Card> :
+      <View style={{height:300,borderRadius:22,overflow:'hidden',backgroundColor:'#DCE3DB'}}><CameraView style={{flex:1}} facing="back" barcodeScannerSettings={{barcodeTypes:['qr']}} onBarcodeScanned={scanned?undefined:event=>readShare(event.data)}/></View>}
+      <Card><Text style={s.h2}>Kod olarak da alabilirsin</Text><Button title="Panodan yapıştır" secondary onPress={() => void pasteShare()}/><TextInput accessibilityLabel="Araç paylaşım kodu" value={importText} onChangeText={setImportText} multiline placeholder="Birinci Vites araç kodunu buraya yapıştır" placeholderTextColor={colors.muted} style={[s.option,{color:colors.ink,fontSize:13,minHeight:110,textAlignVertical:'top'}]}/><Button title="Kodu kontrol et" disabled={!importText.trim()} onPress={()=>readShare(importText)}/></Card>
+    </>}
+    {importCandidate && <Card><Text style={s.eyebrow}>KOD OKUNDU</Text><Text style={s.h2}>{importCandidate.name}</Text><Text style={s.body}>{importCandidate.areas.reduce((total,area)=>total+area.hotspots.length,0)} işaretli parça · {importCandidate.areas.length} bölüm</Text>{profile&&<Text style={s.notice}>Bu işlem mevcut “{profile.name}” araç profilinin yerine geçer.</Text>}<Button title={saving?'Kaydediliyor…':'Bu araç profilini kullan'} disabled={saving} onPress={() => void importShare()}/><Button title="Başka kod okut" secondary disabled={saving} onPress={()=>{setImportCandidate(null);setScanned(false);setError('');}}/></Card>}
   </>;
 
   if (mode === 'edit') return <>

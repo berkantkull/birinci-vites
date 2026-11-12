@@ -1,7 +1,9 @@
 export type CourseCarArea = 'Kaput' | 'Bagaj' | 'Kokpit';
 export type CourseCarHotspot = { id: string; label: string; x: number; y: number };
 export type CourseCarPhoto = { area: CourseCarArea; uri: string; hotspots: CourseCarHotspot[] };
-export type CourseCarProfile = { version: 1; name: string; updatedAt: string; photos: CourseCarPhoto[] };
+export type CourseCarSharedArea = { area: CourseCarArea; hotspots: CourseCarHotspot[] };
+export type CourseCarProfile = { version: 1; name: string; updatedAt: string; photos: CourseCarPhoto[]; sharedHotspots?: CourseCarSharedArea[] };
+export type CourseCarShare = { kind: 'birinci-vites-course-car'; version: 1; name: string; areas: CourseCarSharedArea[] };
 
 export const courseCarAreas: { area: CourseCarArea; description: string; labels: string[] }[] = [
   {
@@ -36,12 +38,14 @@ export function parseCourseCar(raw: string | null): CourseCarProfile | null {
     ...photo,
     hotspots: photo.hotspots.map(hotspot => ({ ...hotspot, x: clamp(hotspot.x), y: clamp(hotspot.y) })),
   }));
-  return { version: 1, name: value.name.trim() || 'Kurs aracım', updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : new Date(0).toISOString(), photos };
+  const sharedHotspots = parseSharedAreas(value.sharedHotspots);
+  return { version: 1, name: value.name.trim() || 'Kurs aracım', updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : new Date(0).toISOString(), photos, ...(sharedHotspots.length ? { sharedHotspots } : {}) };
 }
 
 export function upsertCourseCarPhoto(profile: CourseCarProfile, area: CourseCarArea, uri: string) {
   const existing = profile.photos.find(photo => photo.area === area);
-  const photo: CourseCarPhoto = { area, uri, hotspots: existing?.hotspots ?? [] };
+  const shared = profile.sharedHotspots?.find(item => item.area === area);
+  const photo: CourseCarPhoto = { area, uri, hotspots: existing?.hotspots ?? shared?.hotspots ?? [] };
   return { ...profile, photos: [...profile.photos.filter(item => item.area !== area), photo] };
 }
 
@@ -70,6 +74,51 @@ export function shuffleCourseCarQuestions<T>(items: T[], random = Math.random) {
     [result[index], result[swap]] = [result[swap], result[index]];
   }
   return result;
+}
+
+export function encodeCourseCarShare(profile: CourseCarProfile) {
+  const areas = courseCarAreas.flatMap(({ area }) => {
+    const photo = profile.photos.find(item => item.area === area);
+    const shared = profile.sharedHotspots?.find(item => item.area === area);
+    const hotspots = (photo?.hotspots ?? shared?.hotspots ?? []).map(item => ({ ...item, x: round(item.x), y: round(item.y) }));
+    return hotspots.length ? [{ area, hotspots }] : [];
+  });
+  if (!areas.length) throw new Error('Paylaşılacak işaret bulunamadı');
+  const payload: CourseCarShare = { kind: 'birinci-vites-course-car', version: 1, name: profile.name.trim() || 'Kurs aracım', areas };
+  return JSON.stringify(payload);
+}
+
+export function parseCourseCarShare(raw: string): CourseCarShare {
+  if (!raw || raw.length > 12000) throw new Error('Geçersiz veya çok uzun paylaşım kodu');
+  const value = JSON.parse(raw) as Partial<CourseCarShare>;
+  if (value.kind !== 'birinci-vites-course-car' || value.version !== 1 || typeof value.name !== 'string') throw new Error('Bu kod Birinci Vites araç kodu değil');
+  const areas = parseSharedAreas(value.areas);
+  if (!areas.length) throw new Error('Paylaşım kodunda işaretli parça yok');
+  return { kind: 'birinci-vites-course-car', version: 1, name: value.name.trim() || 'Kurs aracım', areas };
+}
+
+export function courseCarFromShare(share: CourseCarShare): CourseCarProfile {
+  return { version: 1, name: share.name, updatedAt: new Date().toISOString(), photos: [], sharedHotspots: share.areas };
+}
+
+function parseSharedAreas(value: unknown): CourseCarSharedArea[] {
+  if (!Array.isArray(value)) return [];
+  const areas: CourseCarSharedArea[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') continue;
+    const item = entry as Partial<CourseCarSharedArea>;
+    const definition = courseCarAreas.find(area => area.area === item.area);
+    if (!definition || !Array.isArray(item.hotspots)) continue;
+    const hotspots = item.hotspots.filter((point): point is CourseCarHotspot => !!point && typeof point.id === 'string' &&
+      typeof point.label === 'string' && definition.labels.includes(point.label) && Number.isFinite(point.x) && Number.isFinite(point.y))
+      .map(point => ({ ...point, x: clamp(point.x), y: clamp(point.y) }));
+    if (hotspots.length) areas.push({ area: definition.area, hotspots });
+  }
+  return areas;
+}
+
+function round(value: number) {
+  return Math.round(clamp(value) * 1000) / 1000;
 }
 
 function clamp(value: number) {
